@@ -1,0 +1,46 @@
+version: '3.1'
+
+networks:
+  local:
+    external: false
+  global:
+    external: true
+
+services:
+
+  mysql:
+    image: mysql:8
+    restart: always
+    env_file:
+      - .env
+    networks:
+      - local
+    volumes:
+      - ${DATA_DIR}/mysql:/var/lib/mysql
+
+  whmcs:
+    image: nginx-php-debian
+    networks:
+      - local
+      - global
+    restart: always
+    depends_on:
+      - mysql
+    environment:
+      - VIRTUAL_HOST=${DOMAIN}
+    env_file:
+      - .env
+    volumes:
+      - ${DATA_DIR}/whmcs:/usr/share/nginx/html
+      #- ${DATA_DIR}/whmcs/storage:/var/www/storage
+    labels:
+      - "traefik.http.routers.singlbit_whmcs.rule=Host(`${DOMAIN}`)"
+      - "traefik.http.routers.singlbit_whmcs.tls=true"
+      - "traefik.http.services.singlbit_whmcs.loadbalancer.server.port=80"
+      - "traefik.docker.network=global"
+      - "traefik.http.routers.singlbit_whmcs_admin.rule=Host(`${DOMAIN}`) && PathPrefix(`/admin`)"
+      - "traefik.http.routers.singlbit_whmcs_admin.middlewares=dp-auth"
+      - "traefik.http.routers.singlbit_whmcs_admin.tls=true"
+      - "traefik.http.routers.singlbit_whmcs.tls.certresolver=cloudflare"
+
+
