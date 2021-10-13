@@ -1,6 +1,6 @@
 FROM debian:buster
 
-LABEL maintainer="Colin Wilson colin@wyveo.com"
+LABEL maintainer="EdyTheCow"
 
 # Let the container know that there is no tty
 ENV DEBIAN_FRONTEND noninteractive
