@@ -8,6 +8,15 @@ networks:
 
 services:
 
+  # Used for running WHMCS crontabs
+  ofelia:
+    image: mcuadros/ofelia:latest
+    depends_on:
+      - php-fpm
+    command: daemon --docker
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
   nginx:
     image: nginx:alpine
     volumes:
@@ -52,6 +61,10 @@ services:
       - PHP_IDE_CONFIG=xwhmcs
     networks:
       - local
+    labels:
+      - "ofelia.enabled=true"
+      - "ofelia.job-exec.whmcs.schedule=@every 5m"
+      - "ofelia.job-exec.whmcs.command=php -q /var/www/whmcs_storage/crons/cron.php"
 
   mysql:
     image: mysql:8
