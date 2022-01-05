@@ -66,15 +66,33 @@ After installation delete the install folder in `whmcs/data/whmcs/install` and f
 
 # 🔒 Security Hardening
 
+### Changing Configuration Permissions
+Navigate to `whmcs/data/whmcs` and run 
+```
+sudo chmod 400 configuration.php
+```
+
+### Setting correct URL
+Sometimes the URL in admin panel might be using http instead of https which may cause a warning for invalid SSL certificate.
+In the WHMCS panel navigate to `System Setting > General Settings` and make sure `Domain` and `WHMCS System URL` are using https.
+
 ## Moving Files Above Web Root
+Moving files above web root is a recommended practice by official WHMCS documentation. This is fairly easy to do using docker volumes. 
+The volume `whmcs_storage` is used for this exact purpose, directories have been already created so all you need to do is change them in the admin panel.
 
 ### File Storage
+Navigate to `System Setting > Storage Settings` under `Configurations` add listed local storage:
+| Path                                        |
+|---------------------------------------------|
+| /var/www/whmcs_storage/downloads            |
+| /var/www/whmcs_storage/attachments          |
+| /var/www/whmcs_storage/attachments/projects |
+
+Navigate to `Settings` tab and replace tbe old paths with the newly added ones.
 
 ### Templates Cache
 
 ### Crons Directory
-
-## Changing Configuration Permissions
 
 ## Setting update folder
 TODO: https://help.whmcs.com/m/updating/l/678178-configuring-the-temporary-path
