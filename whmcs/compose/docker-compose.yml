@@ -1,46 +1,67 @@
-version: '3.1'
+version: '3.5'
 
 networks:
   local:
     external: false
   global:
-    external: true
+    external: true 
 
 services:
 
-  mysql:
-    image: mysql:8
-    restart: always
-    env_file:
-      - .env
-    networks:
-      - local
+  nginx:
+    image: nginx:alpine
     volumes:
-      - ${DATA_DIR}/mysql:/var/lib/mysql
-
-  whmcs:
-    image: nginx-php-debian
+      - ${DATA_DIR}/whmcs:/var/www/html
+      - ${DATA_DIR}/whmcs_storage:/var/www/whmcs_storage
+      - ${DATA_DIR}/nginx/sites:/etc/nginx/sites-available
+      - ${DATA_DIR}/nginx/logs:/var/log/nginx
+      - ${DATA_DIR}/nginx/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - php-fpm
     networks:
       - local
       - global
-    restart: always
-    depends_on:
-      - mysql
-    environment:
-      - VIRTUAL_HOST=${DOMAIN}
-    env_file:
-      - .env
-    volumes:
-      - ${DATA_DIR}/whmcs:/usr/share/nginx/html
-      #- ${DATA_DIR}/whmcs/storage:/var/www/storage
     labels:
-      - "traefik.http.routers.singlbit_whmcs.rule=Host(`${DOMAIN}`)"
-      - "traefik.http.routers.singlbit_whmcs.tls=true"
-      - "traefik.http.services.singlbit_whmcs.loadbalancer.server.port=80"
       - "traefik.docker.network=global"
-      - "traefik.http.routers.singlbit_whmcs_admin.rule=Host(`${DOMAIN}`) && PathPrefix(`/admin`)"
-      - "traefik.http.routers.singlbit_whmcs_admin.middlewares=dp-auth"
-      - "traefik.http.routers.singlbit_whmcs_admin.tls=true"
-      - "traefik.http.routers.singlbit_whmcs.tls.certresolver=cloudflare"
+      # HTTP
+      - "traefik.http.routers.whmcs.entrypoints=web"
+      - "traefik.http.routers.whmcs.rule=Host(`${DOMAIN}`)"
+      - "traefik.http.routers.whmcs.middlewares=whmcs_https"
+      - "traefik.http.middlewares.whmcs_https.redirectscheme.scheme=https"
+      # HTTPS
+      - "traefik.http.routers.whmcs-https.entrypoints=websecure"
+      - "traefik.http.routers.whmcs-https.rule=Host(`${DOMAIN}`)"
+      - "traefik.http.routers.whmcs-https.tls=true"
+      - "traefik.http.routers.whmcs-https.tls.certresolver=letsencrypt"
+      - "traefik.http.services.whmcs-https.loadbalancer.server.port=80"
+      # Basic auth for /admin page
+      - "traefik.http.routers.whmcs-admin.rule=Host(`${DOMAIN}`) && PathPrefix(`/admin`)"
+      - "traefik.http.routers.whmcs-admin.middlewares=basic-auth"
+      - "traefik.http.routers.whmcs-admin.tls=true"
 
+  php-fpm:
+    build:
+      context: ./php-fpm
+    volumes:
+      - ${DATA_DIR}/whmcs:/var/www/html
+      - ${DATA_DIR}/whmcs_storage:/var/www/whmcs_storage
+      - ${DATA_DIR}/php-fpm/php.ini:/usr/local/etc/php/php.ini
+    expose:
+      - "9000"
+    environment:
+      - PHP_IDE_CONFIG=xwhmcs
+    networks:
+      - local
+
+  mysql:
+    image: mysql:8
+    environment:
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - ${DATA_DIR}/mysql:/var/lib/mysql
+    networks:
+      - local
 
