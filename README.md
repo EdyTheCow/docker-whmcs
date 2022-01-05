@@ -25,11 +25,10 @@ Navigate to `_base/data/traefik/` and run
 sudo chmod 600 acme.json
 ```
 
-<b>Start docker compose</b><br />
-Inside of `_base/compose` run
- ```
-docker-compose up -d
- ```
+<b>Generate .htpasswd user and pass</b><br />
+Navigate to `_base/data/traefik/.htpasswd` and place your generated user/pass in there
+
+Whenever you navigate to your admin area, you'll have to login with generate user and pass and then login with your WHMCS user. This basic auth is very effective against bots and endless spam in emails of failed logins.
 
 <b>Configure Nginx default.conf</b><br />
 Navigate to `whmcs/data/nginx/sites/default.conf` and change these variable:
@@ -71,6 +70,8 @@ After installation delete the install folder in `whmcs/data/whmcs/install` and f
 
 ## Changing Configuration Permissions
 
+## Setting update folder
+TODO: https://help.whmcs.com/m/updating/l/678178-configuring-the-temporary-path
 
 # 🐛 Known issues
 
