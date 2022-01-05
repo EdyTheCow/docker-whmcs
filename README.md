@@ -95,9 +95,11 @@ Navigate to `Settings` tab and replace tbe old paths with the newly added ones.
 
 ### Templates Cache
 Official source: [docs.whmcs.com](https://docs.whmcs.com/Further_Security_Steps#Templates_Cache) <br />
+Navigate to `whmcs/data/whmcs/configuration.php` and add change path for `$templates_compiledir` to `/var/wwww/whmcs_storage/templates_c`
 
 ### Crons Directory
 Official source: [docs.whmcs.com](https://docs.whmcs.com/Further_Security_Steps#Move_the_Crons_Directory) <br />
+
 
 ## Setting update folder
 Official source: [help.whmcs.com](https://help.whmcs.com/m/updating/l/678178-configuring-the-temporary-path) <br />
