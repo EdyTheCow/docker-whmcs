@@ -28,7 +28,7 @@ sudo chmod 600 acme.json
 <b>Generate .htpasswd user and pass</b><br />
 Navigate to `_base/data/traefik/.htpasswd` and place your generated user/pass in there
 
-Whenever you navigate to your admin area, you'll have to login with generate user and pass and then login with your WHMCS user. This basic auth is very effective against bots and endless spam in emails of failed logins.
+Whenever you navigate to your admin area, you'll have to login with generated user and pass and then login with your WHMCS user. This basic auth is very effective against bots and endless spam in emails of failed logins.
 
 <b>Start docker compose</b><br />
 Inside of `_base/compose` run
@@ -67,12 +67,14 @@ After installation delete the install folder in `whmcs/data/whmcs/install` and f
 # 🔒 Security Hardening
 
 ### Changing Configuration Permissions
+Official source: [docs.whmcs.com](https://docs.whmcs.com/Further_Security_Steps#Secure_the_configuration.php_File) <br />
 Navigate to `whmcs/data/whmcs` and run 
 ```
 sudo chmod 400 configuration.php
 ```
 
 ### Setting correct URL
+Official source: [docs.whmcs.com](https://docs.whmcs.com/Further_Security_Steps#Enable_SSL) <br />
 Sometimes the URL in admin panel might be using http instead of https which may cause a warning for invalid SSL certificate.
 In the WHMCS panel navigate to `System Setting > General Settings` and make sure `Domain` and `WHMCS System URL` are using https.
 
@@ -81,6 +83,7 @@ Moving files above web root is a recommended practice by official WHMCS document
 The volume `whmcs_storage` is used for this exact purpose, directories have been already created so all you need to do is change them in the admin panel.
 
 ### File Storage
+Official source: [docs.whmcs.com](https://docs.whmcs.com/Further_Security_Steps#File_Storage) <br />
 Navigate to `System Setting > Storage Settings` under `Configurations` add listed local storage:
 | Path                                        |
 |---------------------------------------------|
@@ -91,11 +94,15 @@ Navigate to `System Setting > Storage Settings` under `Configurations` add liste
 Navigate to `Settings` tab and replace tbe old paths with the newly added ones.
 
 ### Templates Cache
+Official source: [docs.whmcs.com](https://docs.whmcs.com/Further_Security_Steps#Templates_Cache) <br />
 
 ### Crons Directory
+Official source: [docs.whmcs.com](https://docs.whmcs.com/Further_Security_Steps#Move_the_Crons_Directory) <br />
 
 ## Setting update folder
-TODO: https://help.whmcs.com/m/updating/l/678178-configuring-the-temporary-path
+Official source: [help.whmcs.com](https://help.whmcs.com/m/updating/l/678178-configuring-the-temporary-path) <br />
+Setting update folder will allow you to automatically update WHMCS in the future. Similar to file storage the update folder will be located above the web root inside `whmcs_storage` directory.
+Navigate to `Utilities > Update WHMCS` and set the directory to `/var/www/whmcs_storage/whmcs_updater_tmp_dir`
 
 # 🐛 Known issues
 
