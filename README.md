@@ -30,6 +30,12 @@ Navigate to `_base/data/traefik/.htpasswd` and place your generated user/pass in
 
 Whenever you navigate to your admin area, you'll have to login with generate user and pass and then login with your WHMCS user. This basic auth is very effective against bots and endless spam in emails of failed logins.
 
+<b>Start docker compose</b><br />
+Inside of `_base/compose` run
+ ```
+docker-compose up -d
+ ```
+
 <b>Configure Nginx default.conf</b><br />
 Navigate to `whmcs/data/nginx/sites/default.conf` and change these variable:
 | Variable          | Example                 | Description                                                                                       |
