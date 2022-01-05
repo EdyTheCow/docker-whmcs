@@ -99,7 +99,9 @@ Navigate to `whmcs/data/whmcs/configuration.php` and add change path for `$templ
 
 ### Crons Directory
 Official source: [docs.whmcs.com](https://docs.whmcs.com/Further_Security_Steps#Move_the_Crons_Directory) <br />
-
+Navigate to `whmcs/data/whmcs` and move `crons` directory to `whmcs/data/whmcs_storage`. <br />
+Navigate to `crons` and edit `config.php.new`, inside the config uncomment the `whmcspath` option and set the new path to `/var/www/html/`. <br />
+Rename the `config.php.new` to `config.php`. Navigate to `whmcs/data/whmcs/configuration.php` and add this line at the bottom of the configuration `$crons_dir = '/var/www/whmcs_storage/crons/';`
 
 ## Setting update folder
 Official source: [help.whmcs.com](https://help.whmcs.com/m/updating/l/678178-configuring-the-temporary-path) <br />
