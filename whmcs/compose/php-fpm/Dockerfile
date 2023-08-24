@@ -1,4 +1,4 @@
-FROM php:7.4-fpm
+FROM php:8.1-fpm
 
 ENV DEBIAN_FRONTEND noninteractive
 
@@ -50,9 +50,9 @@ RUN rm /etc/apt/preferences.d/no-debian-php && \
 RUN cd /tmp \
     && curl -o ioncube.tar.gz https://downloads.ioncube.com/loader_downloads/ioncube_loaders_lin_x86-64.tar.gz \
     && tar zxpf ioncube.tar.gz \
-    && mv ioncube/ioncube_loader_lin_7.4.so /usr/local/lib/php/extensions/* \
+    && mv ioncube/ioncube_loader_lin_8.1.so /usr/local/lib/php/extensions/* \
     && rm -Rf ioncube.tar.gz ioncube \
-    && echo "zend_extension=ioncube_loader_lin_7.4.so" > /usr/local/etc/php/conf.d/docker-php-ext-ioncube_loader.ini \
+    && echo "zend_extension=ioncube_loader_lin_8.1.so" > /usr/local/etc/php/conf.d/docker-php-ext-ioncube_loader.ini \
     && rm -rf /tmp/ioncube*
 
 COPY ./whmcs.ini /usr/local/etc/php/conf.d
