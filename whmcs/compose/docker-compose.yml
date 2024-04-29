@@ -65,6 +65,7 @@ services:
       - "ofelia.enabled=true"
       - "ofelia.job-exec.whmcs.schedule=@every 5m"
       - "ofelia.job-exec.whmcs.command=php -q /var/www/whmcs_storage/crons/cron.php"
+      # - "ofelia.job-exec.whmcs.command=php -q /var/www/whmcs_storage/crons/pop.php" # Uncomment this if you'd like to activate automatic email import to tickets
 
   mysql:
     image: mysql:8
