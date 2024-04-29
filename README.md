@@ -101,7 +101,8 @@ Navigate to `whmcs/data/whmcs/configuration.php` and add change path for `$templ
 Official source: [docs.whmcs.com](https://docs.whmcs.com/Further_Security_Steps#Move_the_Crons_Directory) <br />
 Navigate to `whmcs/data/whmcs` and move `crons` directory to `whmcs/data/whmcs_storage`. <br />
 Navigate to `crons` and edit `config.php.new`, inside the config uncomment the `whmcspath` option and set the new path to `/var/www/html/`. <br />
-Rename the `config.php.new` to `config.php`. Navigate to `whmcs/data/whmcs/configuration.php` and add this line at the bottom of the configuration `$crons_dir = '/var/www/whmcs_storage/crons/';`
+Rename the `config.php.new` to `config.php`. Navigate to `whmcs/data/whmcs/configuration.php` and add this line at the bottom of the configuration `$crons_dir = '/var/www/whmcs_storage/crons/';` <br />
+Uncomment 'crons/pop.php' in 'whmcs/compose/docker-compose.yml' to activate email import to tickets. Don't forget to rebuild the containers with 'docker-compose up -d' after that.
 
 ## Setting update folder
 Official source: [help.whmcs.com](https://help.whmcs.com/m/updating/l/678178-configuring-the-temporary-path) <br />
@@ -109,6 +110,9 @@ Setting update folder will allow you to automatically update WHMCS in the future
 Navigate to `Utilities > Update WHMCS` and set the directory to `/var/www/whmcs_storage/whmcs_updater_tmp_dir`
 
 # 🐛 Known issues
+
+# Troubleshooting
+Sometimes after an update the containers need a rebuild. Switch to the directory 'whmcs/compose' and run 'docker-compose down' and 'docker-compose up -d'. Please keep in mind that this leads to a short downtime.
 
 # 📜 Credits
 - Logo created by Wob - [Dribbble.com/wob](https://dribbble.com/wob)
