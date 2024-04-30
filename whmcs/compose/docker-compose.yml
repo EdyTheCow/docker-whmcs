@@ -65,6 +65,9 @@ services:
       - "ofelia.enabled=true"
       - "ofelia.job-exec.whmcs.schedule=@every 5m"
       - "ofelia.job-exec.whmcs.command=php -q /var/www/whmcs_storage/crons/cron.php"
+     # Cronjobs for mail-to-ticket import. Uncomment to fetch new emails every minute.
+     # - "ofelia.job-exec.whmcs-mail-import.schedule=@every 1m"
+     # - "ofelia.job-exec.whmcs-mail-import.command=php -q /var/www/whmcs_storage/crons/pop.php"
 
   mysql:
     image: mysql:8
