@@ -103,6 +103,11 @@ Navigate to `whmcs/data/whmcs` and move `crons` directory to `whmcs/data/whmcs_s
 Navigate to `crons` and edit `config.php.new`, inside the config uncomment the `whmcspath` option and set the new path to `/var/www/html/`. <br />
 Rename the `config.php.new` to `config.php`. Navigate to `whmcs/data/whmcs/configuration.php` and add this line at the bottom of the configuration `$crons_dir = '/var/www/whmcs_storage/crons/';`
 
+### eMail Import Cron (optional)
+Official source: [docs.whmcs.com](https://docs.whmcs.com/Email_Importing) <br />
+Navigate to `whmcs/compose` and edit `docker-compose.yml`, inside the file uncomment the two commands under the ofelia-labels.<br />
+Rebuild stack with `docker-compose down && docker-compose up -d`.
+
 ## Setting update folder
 Official source: [help.whmcs.com](https://help.whmcs.com/m/updating/l/678178-configuring-the-temporary-path) <br />
 Setting update folder will allow you to automatically update WHMCS in the future. Similar to file storage the update folder will be located above the web root inside `whmcs_storage` directory.
