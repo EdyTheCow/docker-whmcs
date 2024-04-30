@@ -25,6 +25,11 @@ Navigate to `_base/data/traefik/` and run
 sudo chmod 600 acme.json
 ```
 
+<b>Create docker network</b><br />
+```
+docker network create docker-whmcs-network
+```
+
 <b>Generate .htpasswd user and pass</b><br />
 Navigate to `_base/data/traefik/.htpasswd` and place your generated user/pass in there
 
