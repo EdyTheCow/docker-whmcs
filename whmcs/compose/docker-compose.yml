@@ -1,9 +1,9 @@
 version: '3.5'
 
 networks:
-  local:
+  docker-whmcs-network-internal:
     external: false
-  global:
+  docker-whmcs-network:
     external: true 
 
 services:
@@ -28,10 +28,10 @@ services:
     depends_on:
       - php-fpm
     networks:
-      - local
-      - global
+      - docker-whmcs-network-internal
+      - docker-whmcs-network
     labels:
-      - "traefik.docker.network=global"
+      - "traefik.docker.network=docker-whmcs-network"
       # HTTP
       - "traefik.http.routers.whmcs.entrypoints=web"
       - "traefik.http.routers.whmcs.rule=Host(`${DOMAIN}`)"
@@ -60,7 +60,7 @@ services:
     environment:
       - PHP_IDE_CONFIG=xwhmcs
     networks:
-      - local
+      - docker-whmcs-network-internal
     labels:
       - "ofelia.enabled=true"
       - "ofelia.job-exec.whmcs.schedule=@every 5m"
@@ -79,5 +79,5 @@ services:
     volumes:
       - ${DATA_DIR}/mysql:/var/lib/mysql
     networks:
-      - local
+      - docker-whmcs-network-internal
 
