@@ -63,7 +63,7 @@ Navigate to `whmcs/compose/.env` and set these variables:
 <b>Start docker compose</b><br />
 Inside of `whmcs/compose` run
  ```
-docker-compose up -d
+docker compose up -d
  ```
 Now you can navigate to `your-domain.com/install` and follow the installation insturctions. Use `mysql` for MySQL host. User, database and password are found in `whmcs/compose/.env` where you configured them earlier.
 
@@ -111,7 +111,7 @@ Rename the `config.php.new` to `config.php`. Navigate to `whmcs/data/whmcs/confi
 ### eMail Import Cron (optional)
 Official source: [docs.whmcs.com](https://docs.whmcs.com/Email_Importing) <br />
 Navigate to `whmcs/compose` and edit `docker-compose.yml`, inside the file uncomment the two commands under the ofelia-labels.<br />
-Rebuild stack with `docker-compose down && docker-compose up -d`.
+Rebuild stack with `docker compose down && docker compose up -d`.
 
 ## Setting update folder
 Official source: [help.whmcs.com](https://help.whmcs.com/m/updating/l/678178-configuring-the-temporary-path) <br />
