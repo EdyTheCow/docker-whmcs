@@ -31,7 +31,7 @@ docker network create docker-whmcs-network
 ```
 
 <b>Generate .htpasswd user and pass</b><br />
-Navigate to `_base/data/traefik/.htpasswd` and place your generated user/pass in there
+Navigate to `_base/data/traefik/.htpasswd` and place your httpasswd user/pass in there.
 
 Whenever you navigate to your admin area, you'll have to login with generated user and pass and then login with your WHMCS user. This basic auth is very effective against bots and endless spam in emails of failed logins.
 
