@@ -30,10 +30,12 @@ sudo chmod 600 acme.json
 docker network create docker-whmcs-network
 ```
 
-<b>Generate .htpasswd user and pass</b><br />
-Navigate to `_base/data/traefik/.htpasswd` and place your httpasswd user/pass in there.
+<b>Generate .htpasswd user and password</b><br />
+Navigate to `_base/data/traefik/.htpasswd` and place your htpasswd user/password in there. 
 
-Whenever you navigate to your admin area, you'll have to login with generated user and pass and then login with your WHMCS user. This basic auth is very effective against bots and endless spam in emails of failed logins.
+If you do not know how to generate such credentials, take a look at detailed guide showcasing multiple different ways https://www.digitalocean.com/community/tutorials/how-to-set-up-password-authentication-with-nginx-on-ubuntu-14-04 (you only need to generated .htpasswd credentials, the rest of guide can be ignored)
+
+Once done, whenever you navigate to your whmcs admin area, you'll have to login with generated user and password and then login with your WHMCS admin user. This basic auth is very effective against bots and endless spam in emails of failed logins. This only applies for admin page of WHMCS, regular users won't be affected.
 
 <b>Start docker compose</b><br />
 Inside of `_base/compose` run
