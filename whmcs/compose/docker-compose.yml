@@ -31,6 +31,7 @@ services:
       - docker-whmcs-network-internal
       - docker-whmcs-network
     labels:
+      - "traefik.enable=true"
       - "traefik.docker.network=docker-whmcs-network"
       # HTTP
       - "traefik.http.routers.whmcs.entrypoints=web"
@@ -45,6 +46,7 @@ services:
       - "traefik.http.services.whmcs-https.loadbalancer.server.port=80"
       # Basic auth for /admin page
       - "traefik.http.routers.whmcs-admin.rule=Host(`${DOMAIN}`) && PathPrefix(`/admin`)"
+      - "traefik.http.middlewares.basic-auth.basicauth.usersfile=/.htpasswd"
       - "traefik.http.routers.whmcs-admin.middlewares=basic-auth"
       - "traefik.http.routers.whmcs-admin.tls=true"
 
