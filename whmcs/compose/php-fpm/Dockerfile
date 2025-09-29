@@ -1,8 +1,7 @@
 FROM php:8.1-fpm
-
 ENV DEBIAN_FRONTEND noninteractive
 
-RUN set -eux; \ 
+RUN set -eux; \
   apt-get update; \
   apt-get install -y --no-install-recommends \
           libzip-dev \
@@ -18,12 +17,8 @@ RUN set -eux; \
   rm -rf /var/lib/apt/lists/*
 
 # Install additional PHP Packages and WHMCS Requirements
-
-RUN docker-php-ext-configure zip
-RUN docker-php-ext-install zip
-
-RUN docker-php-ext-install pdo_mysql
-RUN docker-php-ext-install mysqli
+RUN docker-php-ext-configure zip && \
+    docker-php-ext-install zip pdo_mysql mysqli
 
 RUN docker-php-ext-configure gd \
   --prefix=/usr \
@@ -38,15 +33,11 @@ RUN apt-get update -yqq && \
     docker-php-ext-configure intl && \
     docker-php-ext-install intl
 
-RUN docker-php-ext-install opcache
-COPY ./opcache.ini /usr/local/etc/php/conf.d/opcache.ini
-
 RUN rm /etc/apt/preferences.d/no-debian-php && \
     apt-get -y install libxml2-dev php-soap && \
     docker-php-ext-install soap;
 
-# Install the php ioncube loader
-# Essential part to run WHMCS
+# Install the php ioncube loader (essential part to run WHMCS)
 RUN cd /tmp \
     && curl -o ioncube.tar.gz https://downloads.ioncube.com/loader_downloads/ioncube_loaders_lin_x86-64.tar.gz \
     && tar zxpf ioncube.tar.gz \
@@ -59,16 +50,8 @@ COPY ./whmcs.ini /usr/local/etc/php/conf.d
 COPY ./xwhmcs.pool.conf /usr/local/etc/php-fpm.d/
 
 USER root
-
-# Clean up
-RUN apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
-    rm /var/log/lastlog /var/log/faillog
-
 RUN usermod -u 1000 www-data
-
 WORKDIR /var/www
 
 CMD ["php-fpm"]
-
 EXPOSE 9000
