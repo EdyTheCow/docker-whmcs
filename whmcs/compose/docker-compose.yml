@@ -49,8 +49,7 @@ services:
       - "traefik.http.routers.whmcs-admin.tls=true"
 
   php-fpm:
-    build:
-      context: ./php-fpm
+    image: ghcr.io/edythecow/whmcs-php-fpm:latest
     volumes:
       - ${DATA_DIR}/whmcs:/var/www/html
       - ${DATA_DIR}/whmcs_storage:/var/www/whmcs_storage
