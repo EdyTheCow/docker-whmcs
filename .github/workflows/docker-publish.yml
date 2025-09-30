@@ -2,12 +2,12 @@ name: Build and publish whmcs-php-fpm docker image
 
 on:
   push:
-    branches: [master]
+    branches: [docker-images]
     paths:
-      - 'docker-images/whmcs-php-fpm/**'
+      - 'whmcs-php-fpm/**'
   pull_request:
     paths:
-      - 'docker-images/whmcs-php-fpm/**'
+      - 'whmcs-php-fpm/**'
 
 jobs:
   build-and-push-docker-image:

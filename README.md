@@ -22,8 +22,6 @@ This project uses Nginx instead of Apache as a web server, WHMCS was developed w
 git clone https://github.com/EdyTheCow/docker-whmcs.git
 ```
 
-The directory `docker-images` can be removed/ignored unless you want to modify and build the docker image `php-fpm` yourself. This image is already pre-built by this repository and is being used in `whmcs/compose/docker-compose.yml`.
-
 <b>Set correct acme.json permissions</b><br />
 Navigate to `_base/data/traefik/` and run:
 ```
