@@ -52,5 +52,6 @@ COPY ./xwhmcs.pool.conf /usr/local/etc/php-fpm.d/
 USER root
 RUN usermod -u 1000 www-data
 WORKDIR /var/www
+
 CMD ["php-fpm"]
 EXPOSE 9000
