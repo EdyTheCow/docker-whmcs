@@ -2,7 +2,7 @@ name: Build and publish WHMCS Docker images
 
 on:
   push:
-    branches: [docker-images]
+    branches: [ docker-images ]
     paths:
       - 'whmcs-php-fpm/**'
       - 'whmcs-nginx/**'
@@ -31,25 +31,25 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # Build & push the PHP-FPM image
+      # --- PHP-FPM IMAGE ---
       - name: Build & push whmcs-php-fpm
-        uses: docker/build-push-action@v6
         id: build_php
+        uses: docker/build-push-action@v6
         with:
           context: whmcs-php-fpm/
           tags: ghcr.io/edythecow/whmcs-php-fpm:latest
           push: true
 
-      # Build & push the NGINX image
+      # --- NGINX IMAGE ---
       - name: Build & push whmcs-nginx
-        uses: docker/build-push-action@v6
         id: build_nginx
+        uses: docker/build-push-action@v6
         with:
           context: whmcs-nginx/
           tags: ghcr.io/edythecow/whmcs-nginx:latest
           push: true
 
-      # Output digests (optional)
+      # Digests
       - name: PHP-FPM image digest
         run: echo "PHP-FPM digest: ${{ steps.build_php.outputs.digest }}"
 
