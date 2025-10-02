@@ -1,7 +1,3 @@
-networks:
-  docker-whmcs-network:
-    external: true
-
 services:
 
   traefik:
@@ -21,3 +17,7 @@ services:
       - ${DATA_DIR}/traefik/.htpasswd:/.htpasswd
     labels:
       - "traefik.http.middlewares.basic-auth.basicauth.usersfile=/.htpasswd"
+
+networks:
+  docker-whmcs-network:
+    external: true
