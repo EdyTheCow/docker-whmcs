@@ -1,17 +1,19 @@
-name: Build and publish whmcs-php-fpm docker image
+name: Build and publish WHMCS Docker images
 
 on:
   push:
     branches: [docker-images]
     paths:
       - 'whmcs-php-fpm/**'
+      - 'whmcs-nginx/**'
   pull_request:
     paths:
       - 'whmcs-php-fpm/**'
+      - 'whmcs-nginx/**'
 
 jobs:
-  build-and-push-docker-image:
-    name: Build Docker image and push
+  build-and-push:
+    name: Build & Push Docker Images
     runs-on: ubuntu-latest
 
     steps:
@@ -22,19 +24,34 @@ jobs:
         id: buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Login to Github Packages
+      - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      
-      - name: Build image and push to GitHub Container Registry
+
+      # Build & push the PHP-FPM image
+      - name: Build & push whmcs-php-fpm
         uses: docker/build-push-action@v6
+        id: build_php
         with:
-          context: whmcs-php-fpm/.
+          context: whmcs-php-fpm/
           tags: ghcr.io/edythecow/whmcs-php-fpm:latest
           push: true
 
-      - name: Image digest
-        run: echo ${{ steps.docker_build.outputs.digest }}
+      # Build & push the NGINX image
+      - name: Build & push whmcs-nginx
+        uses: docker/build-push-action@v6
+        id: build_nginx
+        with:
+          context: whmcs-nginx/
+          tags: ghcr.io/edythecow/whmcs-nginx:latest
+          push: true
+
+      # Output digests (optional)
+      - name: PHP-FPM image digest
+        run: echo "PHP-FPM digest: ${{ steps.build_php.outputs.digest }}"
+
+      - name: NGINX image digest
+        run: echo "NGINX digest: ${{ steps.build_nginx.outputs.digest }}"
