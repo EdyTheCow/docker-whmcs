@@ -49,6 +49,7 @@ server {
         fastcgi_buffers 16 16k;
         fastcgi_buffer_size 32k;
         fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_param SERVER_ADDR ${PUBLIC_SERVER_IP}; # This is used by WHMCS to fetch correct IP for the license
         fastcgi_param HTTPS on;
         fastcgi_read_timeout 600;
     }
