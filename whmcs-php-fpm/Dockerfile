@@ -48,6 +48,7 @@ RUN cd /tmp \
 
 COPY ./whmcs.ini /usr/local/etc/php/conf.d
 COPY ./xwhmcs.pool.conf /usr/local/etc/php-fpm.d/
+COPY ./php.ini /usr/local/etc/php/php.ini
 
 USER root
 RUN usermod -u 1000 www-data
