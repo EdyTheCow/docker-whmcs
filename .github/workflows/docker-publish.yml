@@ -32,28 +32,40 @@ jobs:
             nginx:
               - 'whmcs-nginx/**'
 
+  matrix:
+    name: Build matrix
+    needs: changes
+    runs-on: ubuntu-latest
+    outputs:
+      include: ${{ steps.set.outputs.matrix }}
+    steps:
+      - name: Build dynamic matrix JSON
+        id: set
+        run: |
+          # Start with an empty matrix
+          MATRIX='{"include":[]}'
+          # Add php image if its folder changed
+          if [ "${{ needs.changes.outputs.php }}" = "true" ]; then
+            MATRIX=$(echo "$MATRIX" | jq '.include += [{"name":"whmcs-php-fpm","context":"whmcs-php-fpm/","tag":"ghcr.io/edythecow/whmcs-php-fpm:latest"}]')
+          fi
+          # Add nginx image if its folder changed
+          if [ "${{ needs.changes.outputs.nginx }}" = "true" ]; then
+            MATRIX=$(echo "$MATRIX" | jq '.include += [{"name":"whmcs-nginx","context":"whmcs-nginx/","tag":"ghcr.io/edythecow/whmcs-nginx:latest"}]')
+          fi
+          echo "matrix=$MATRIX" >> "$GITHUB_OUTPUT"
+
   build-and-push:
     name: Build & Push (${{ matrix.name }})
-    needs: changes
+    needs: matrix
+    # Skip the entire job if the include list is empty
+    if: ${{ needs.matrix.outputs.include != '' && needs.matrix.outputs.include != '{"include":[]}' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: write   # required for ghcr
-    # Run each matrix ONLY if its folder changed
-    if: |
-      (matrix.changed_output == 'php' && needs.changes.outputs.php == 'true') ||
-      (matrix.changed_output == 'nginx' && needs.changes.outputs.nginx == 'true')
+      packages: write
+
     strategy:
-      matrix:
-        include:
-          - name: whmcs-php-fpm
-            context: whmcs-php-fpm/
-            tag: ghcr.io/edythecow/whmcs-php-fpm:latest
-            changed_output: php
-          - name: whmcs-nginx
-            context: whmcs-nginx/
-            tag: ghcr.io/edythecow/whmcs-nginx:latest
-            changed_output: nginx
+      matrix: ${{ fromJSON(needs.matrix.outputs.include) }}
 
     steps:
       - name: Checkout
