@@ -12,62 +12,36 @@ on:
       - 'whmcs-nginx/**'
 
 jobs:
-  changes:
-    runs-on: ubuntu-latest
-    outputs:
-      php:   ${{ steps.filter.outputs.php }}
-      nginx: ${{ steps.filter.outputs.nginx }}
-    steps:
-      - uses: actions/checkout@v4
-      - id: filter
-        uses: dorny/paths-filter@v3
-        with:
-          filters: |
-            php:
-              - 'whmcs-php-fpm/**'
-            nginx:
-              - 'whmcs-nginx/**'
-
-  matrix:
-    needs: changes
-    runs-on: ubuntu-latest
-    outputs:
-      include: ${{ steps.set.outputs.include }}
-    steps:
-      - name: Build dynamic matrix JSON
-        id: set
-        shell: bash
-        run: |
-          MATRIX='{"include":[]}'
-          if [ "${{ needs.changes.outputs.php }}" = "true" ]; then
-            MATRIX=$(echo "$MATRIX" | jq -c '.include += [{"name":"whmcs-php-fpm","context":"whmcs-php-fpm/","tag":"ghcr.io/edythecow/whmcs-php-fpm:latest"}]')
-          fi
-          if [ "${{ needs.changes.outputs.nginx }}" = "true" ]; then
-            MATRIX=$(echo "$MATRIX" | jq -c '.include += [{"name":"whmcs-nginx","context":"whmcs-nginx/","tag":"ghcr.io/edythecow/whmcs-nginx:latest"}]')
-          fi
-          echo "include=$MATRIX" >> "$GITHUB_OUTPUT"
-
   build-and-push:
-    name: Build & Push (${{ matrix.name }})
-    needs: matrix
-    if: ${{ needs.matrix.outputs.include != '' && needs.matrix.outputs.include != '{"include":[]}' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: write
-    strategy:
-      matrix: ${{ fromJSON(needs.matrix.outputs.include) }}
+      packages: write   # required to push to ghcr.io
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: docker/setup-buildx-action@v3
-      - uses: docker/login-action@v3
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build & push ${{ matrix.name }}
+
+      - name: Build & push whmcs-php-fpm
         uses: docker/build-push-action@v6
         with:
-          context: ${{ matrix.context }}
+          context: whmcs-php-fpm/
           push: true
-          tags: ${{ matrix.tag }}
+          tags: ghcr.io/edythecow/whmcs-php-fpm:latest
+
+      - name: Build & push whmcs-nginx
+        uses: docker/build-push-action@v6
+        with:
+          context: whmcs-nginx/
+          push: true
+          tags: ghcr.io/edythecow/whmcs-nginx:latest
