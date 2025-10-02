@@ -1,0 +1,19 @@
+name: Build WHMCS PHP-FPM
+
+on:
+  push:
+    branches: [ docker-images ]
+    paths:
+      - 'whmcs-php-fpm/**'
+  pull_request:
+    paths:
+      - 'whmcs-php-fpm/**'
+
+jobs:
+  build:
+    uses: ./.github/workflows/build-image-common.yml
+    with:
+      context: whmcs-php-fpm
+      image_tag: ghcr.io/edythecow/whmcs-php-fpm:latest
+    secrets:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

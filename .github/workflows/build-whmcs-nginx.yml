@@ -1,0 +1,19 @@
+name: Build WHMCS NGINX
+
+on:
+  push:
+    branches: [ docker-images ]
+    paths:
+      - 'whmcs-nginx/**'
+  pull_request:
+    paths:
+      - 'whmcs-nginx/**'
+
+jobs:
+  build:
+    uses: ./.github/workflows/build-image-common.yml
+    with:
+      context: whmcs-nginx
+      image_tag: ghcr.io/edythecow/whmcs-nginx:latest
+    secrets:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
