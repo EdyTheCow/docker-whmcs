@@ -38,17 +38,17 @@ server {
     real_ip_recursive on;
 
     location / {
-        try_files $$uri $$uri/ /index.php$$is_args$$args;
+        try_files $uri $uri/ /index.php$is_args$args;
     }
 
     location ~ \.php$ {
         include fastcgi_params;
-        try_files $$uri /index.php =404;
+        try_files $uri /index.php =404;
         fastcgi_pass php-fpm:9000;
         fastcgi_index index.php;
         fastcgi_buffers 16 16k;
         fastcgi_buffer_size 32k;
-        fastcgi_param SCRIPT_FILENAME $$document_root$$fastcgi_script_name;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
         fastcgi_param HTTPS on;
         fastcgi_read_timeout 600;
     }
