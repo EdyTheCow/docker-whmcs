@@ -15,3 +15,4 @@ jobs:
     with:
       context: whmcs-php-fpm
       image_tag: ghcr.io/edythecow/whmcs-php-fpm:latest
+      cache_scope: whmcs-php-fpm

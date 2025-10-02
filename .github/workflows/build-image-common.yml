@@ -1,4 +1,4 @@
-name: Build & Push Docker Image Common
+name: Build & Push Docker Image (Reusable)
 
 on:
   workflow_call:
@@ -7,6 +7,9 @@ on:
         required: true
         type: string
       image_tag:
+        required: true
+        type: string
+      cache_scope:
         required: true
         type: string
 
@@ -37,3 +40,5 @@ jobs:
           context: ${{ inputs.context }}
           push: true
           tags: ${{ inputs.image_tag }}
+          cache-from: type=gha,scope=${{ inputs.cache_scope }}
+          cache-to:   type=gha,mode=max,scope=${{ inputs.cache_scope }}

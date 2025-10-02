@@ -15,3 +15,4 @@ jobs:
     with:
       context: whmcs-nginx
       image_tag: ghcr.io/edythecow/whmcs-nginx:latest
+      cache_scope: whmcs-nginx
