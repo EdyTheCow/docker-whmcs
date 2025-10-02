@@ -13,17 +13,13 @@ on:
 
 jobs:
   changes:
-    name: Detect changed paths
     runs-on: ubuntu-latest
     outputs:
-      php: ${{ steps.filter.outputs.php }}
+      php:   ${{ steps.filter.outputs.php }}
       nginx: ${{ steps.filter.outputs.nginx }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Paths filter
-        id: filter
+      - uses: actions/checkout@v4
+      - id: filter
         uses: dorny/paths-filter@v3
         with:
           filters: |
@@ -33,54 +29,42 @@ jobs:
               - 'whmcs-nginx/**'
 
   matrix:
-    name: Build matrix
     needs: changes
     runs-on: ubuntu-latest
     outputs:
-      include: ${{ steps.set.outputs.matrix }}
+      include: ${{ steps.set.outputs.include }}
     steps:
       - name: Build dynamic matrix JSON
         id: set
+        shell: bash
         run: |
-          # Start with an empty matrix
           MATRIX='{"include":[]}'
-          # Add php image if its folder changed
           if [ "${{ needs.changes.outputs.php }}" = "true" ]; then
-            MATRIX=$(echo "$MATRIX" | jq '.include += [{"name":"whmcs-php-fpm","context":"whmcs-php-fpm/","tag":"ghcr.io/edythecow/whmcs-php-fpm:latest"}]')
+            MATRIX=$(echo "$MATRIX" | jq -c '.include += [{"name":"whmcs-php-fpm","context":"whmcs-php-fpm/","tag":"ghcr.io/edythecow/whmcs-php-fpm:latest"}]')
           fi
-          # Add nginx image if its folder changed
           if [ "${{ needs.changes.outputs.nginx }}" = "true" ]; then
-            MATRIX=$(echo "$MATRIX" | jq '.include += [{"name":"whmcs-nginx","context":"whmcs-nginx/","tag":"ghcr.io/edythecow/whmcs-nginx:latest"}]')
+            MATRIX=$(echo "$MATRIX" | jq -c '.include += [{"name":"whmcs-nginx","context":"whmcs-nginx/","tag":"ghcr.io/edythecow/whmcs-nginx:latest"}]')
           fi
-          echo "matrix=$MATRIX" >> "$GITHUB_OUTPUT"
+          echo "include=$MATRIX" >> "$GITHUB_OUTPUT"
 
   build-and-push:
     name: Build & Push (${{ matrix.name }})
     needs: matrix
-    # Skip the entire job if the include list is empty
     if: ${{ needs.matrix.outputs.include != '' && needs.matrix.outputs.include != '{"include":[]}' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
-
     strategy:
       matrix: ${{ fromJSON(needs.matrix.outputs.include) }}
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Login to GHCR
-        uses: docker/login-action@v3
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Build & push ${{ matrix.name }}
         uses: docker/build-push-action@v6
         with:
