@@ -16,4 +16,4 @@ jobs:
       context: whmcs-nginx
       image_tag: ghcr.io/edythecow/whmcs-nginx:latest
     secrets:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      inherit: true

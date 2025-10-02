@@ -1,5 +1,5 @@
+# build-whmcs-php-fpm.yml
 name: Build WHMCS PHP-FPM
-
 on:
   push:
     branches: [ docker-images ]
@@ -16,4 +16,4 @@ jobs:
       context: whmcs-php-fpm
       image_tag: ghcr.io/edythecow/whmcs-php-fpm:latest
     secrets:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      inherit: true
