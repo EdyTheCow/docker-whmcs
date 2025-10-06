@@ -5,7 +5,6 @@ services:
     volumes:
       - ${DATA_DIR}/whmcs:/var/www/html
       - ${DATA_DIR}/whmcs_storage:/var/www/whmcs_storage
-      - ${DATA_DIR}/nginx_logs:/var/log/nginx
     environment:
       - NGINX_DOMAIN=${DOMAIN}
       - TRAEFIK_SUBNET=${TRAEFIK_SUBNET}
