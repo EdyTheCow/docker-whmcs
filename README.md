@@ -68,15 +68,12 @@ Navigate to `whmcs/compose/.env` and set these variables:
 
 If you're still unsure about your Traefik's subnet, set it as example value shown above for now. Then later on once WHMCS is running navigate to `System Logs > Admin Log` and you'll see IP Address. It should look something like `172.18.0.2` or similar. We're interested in the second number. So if the IP shown was `172.18.0.2` the subnet that should be set as: `172.18.0.0/16`. Restart and check the logs again, this time your real IP should be displayed.
 
-<b>Place contents of WHMCS files</b><br />
-Navigate to `whmcs/data/whmcs` and place the contents of WHMCS you downloaded from whmcs.com in there.
-
 <b>Start docker compose</b><br />
 Inside of `whmcs/compose` run the command below. This will start WHMCS and rest of the services.
  ```
 docker compose up -d
  ```
-Now you can navigate to `your-domain.com/install` and follow the installation insturctions. Use `mysql` for MySQL host. User, database name and password are found in `whmcs/compose/.env` where you configured them earlier.
+Latest stable version of WHMCS should be automatically downloaded to `whmcs/data/whmcs` using WHMCS public API. Now you can navigate to `your-domain.com/install` and follow the installation insturctions. Use `mysql` for MySQL host. User, database name and password are found in `whmcs/compose/.env` where you configured them earlier.
 
 After installation delete the install folder in `whmcs/data/whmcs/install` and follow the instruction below for additional configuration for security hardening.
 
