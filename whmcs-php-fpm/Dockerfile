@@ -19,8 +19,8 @@ RUN set -eux; \
   echo "zend_extension=ioncube_loader_lin_${php_minor}.so" > /usr/local/etc/php/conf.d/00-ioncube.ini; \
   rm -rf /tmp/ioncube*
 
-COPY ./whmcs.ini /usr/local/etc/php/conf.d/zz-whmcs.ini
-COPY ./xwhmcs.pool.conf /usr/local/etc/php-fpm.d/zz-whmcs.conf
+COPY config/whmcs.ini /usr/local/etc/php/conf.d/zz-whmcs.ini
+COPY config/xwhmcs.pool.conf /usr/local/etc/php-fpm.d/zz-whmcs.conf
 
 USER www-data
 WORKDIR /var/www
