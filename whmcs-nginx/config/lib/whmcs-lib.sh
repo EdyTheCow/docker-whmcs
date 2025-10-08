@@ -17,7 +17,8 @@ die()  { echo "[whmcs-init][ERROR] $*" >&2; exit 1; }
 
 is_empty_dir() {
   # empty if no entries except possible .gitignore
-  [ -z "$(find "$1" -mindepth 1 -maxdepth 1 -not -name '.gitignore' -print -quit 2>/dev/null)" ]
+  [ -d "$1" ] || return 2
+  [ -z "$(find "$1" -mindepth 1 -maxdepth 1 ! -name '.gitignore' -print 2>/dev/null | head -n 1)" ]
 }
 
 ensure_tree_if_empty() {
