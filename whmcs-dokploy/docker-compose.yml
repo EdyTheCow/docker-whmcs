@@ -1,61 +1,33 @@
 services:
 
-  volume_init:
-    image: "alpine:latest"
-    command: | # TODO: Create sub directories for whmcs_storage
-      mkdir -p /srv/data/whmcs_web-root/ /srv/data/nginx_logs/ /srv/data/whmcs_storage/
-    volumes:
-      - whmcs-data:/srv/data
-
   nginx:
     image: ghcr.io/edythecow/whmcs-nginx:latest
     volumes:
-      - type: volume
-        source: whmcs-data
-        target: /var/www/html
-        volume:
-          subpath: whmcs_web-root/
-      - type: volume
-        source: whmcs-data
-        target: /var/www/whmcs_storage
-        volume:
-          subpath: whmcs_storage/
-      - type: volume
-        source: nginx-data
-        target: /var/log/nginx
-        volume:
-          subpath: nginx_logs/
+      - whmcs-web-root:/var/www/html
+      - whmcs-storage:/var/www/whmcs_storage
     environment:
       - NGINX_DOMAIN=${DOMAIN}
       - TRAEFIK_SUBNET=${TRAEFIK_SUBNET}
       - PUBLIC_SERVER_IP=${PUBLIC_SERVER_IP}
     depends_on:
-      - volume_init
       - php-fpm
     labels:
-      # Basic auth for /admin page TODO: Move credentials directly inside the label
-      - "traefik.http.routers.whmcs-admin.rule=Host(`${DOMAIN}`) && PathPrefix(`/admin`)"
-      - "traefik.http.middlewares.basic-auth.basicauth.usersfile=/.htpasswd"
-      - "traefik.http.routers.whmcs-admin.middlewares=basic-auth"
+      # Basic auth for /admin page
+      - "traefik.http.routers.whmcs-admin.rule=Host(`${DOMAIN}`) && (Path(`/admin`) || PathPrefix(`/admin/`))"
+      - "traefik.http.routers.whmcs-admin.entrypoints=websecure"
       - "traefik.http.routers.whmcs-admin.tls=true"
+      - "traefik.http.routers.whmcs-admin.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.whmcs-admin.priority=10000"
+      - "traefik.http.routers.whmcs-admin.service=whmcs-admin-svc"
+      - "traefik.http.services.whmcs-admin-svc.loadbalancer.server.port=80"
+      - "traefik.http.middlewares.whmcs-admin-auth.basicauth.users=${BASIC_AUTH_CREDENTIALS}"
+      - "traefik.http.routers.whmcs-admin.middlewares=whmcs-admin-auth@docker"
 
   php-fpm:
     image: ghcr.io/edythecow/whmcs-php-fpm:latest
     volumes:
-      - type: volume
-        source: whmcs-data
-        target: /var/www/html
-        volume:
-          subpath: whmcs_web-root/
-      - type: volume
-        source: whmcs-data
-        target: /var/www/whmcs_storage
-        volume:
-          subpath: whmcs_storage/
-    expose:
-      - "9000"
-    depends_on:
-      - volume_init
+      - whmcs-web-root:/var/www/html
+      - whmcs-storage:/var/www/whmcs_storage
     environment:
       - PHP_IDE_CONFIG=xwhmcs
     labels:
@@ -86,5 +58,6 @@ services:
       - whmcs-database:/var/lib/mysql
 
 volumes:
-  whmcs-data:
+  whmcs-web-root:
+  whmcs-storage:
   whmcs-database:
