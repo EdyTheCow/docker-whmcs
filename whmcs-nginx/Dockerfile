@@ -8,7 +8,11 @@ RUN apk add --no-cache curl jq unzip su-exec
 COPY config/default.conf.template /etc/nginx/templates/default.conf.template
 
 # --- Library with shared helpers ---
-COPY config/lib/whmcs-lib.sh /usr/local/lib/whmcs-lib.sh
+COPY config/whmcs-lib.sh /usr/local/lib/whmcs-lib.sh
+
+# --- Post WHMCS installation configuration script (optional, can be done manually too) ---
+COPY config/whmcs-post-install-config.sh /usr/local/bin/whmcs-post-install-config.sh
+RUN chmod +x /usr/local/bin/whmcs-post-install-config.sh
 
 # --- Modular init scripts (executed in sorted order by the official entrypoint) ---
 COPY config/docker-entrypoint.d/*.sh /docker-entrypoint.d/

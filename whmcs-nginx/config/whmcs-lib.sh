@@ -15,12 +15,31 @@ log()  { echo "[whmcs-init] $*"; }
 warn() { echo "[whmcs-init][WARN] $*" >&2; }
 die()  { echo "[whmcs-init][ERROR] $*" >&2; exit 1; }
 
+##
+# Check if directory is empty, ignore (.gitignore)
+##
 is_empty_dir() {
-  # empty if no entries except possible .gitignore
   [ -d "$1" ] || return 2
   [ -z "$(find "$1" -mindepth 1 -maxdepth 1 ! -name '.gitignore' -print 2>/dev/null | head -n 1)" ]
 }
 
+##
+# Replace or append a config option in .php config
+# Usage: sed_set_or_append_php_var <file> <varname> <value>
+##
+sed_set_or_append_php_var() {
+  f="$1"; v="$2"; val="$3"
+  esc_val=$(printf "%s" "$val" | sed 's/[&/\]/\\&/g')
+  if grep -q "^[[:space:]]*\\\$$v[[:space:]]*=" "$f"; then
+    sed -i "s#^[[:space:]]*\\\$$v[[:space:]]*=.*#\$$v = '$esc_val';#" "$f"
+  else
+    printf "\n\$%s = '%s';\n" "$v" "$val" >> "$f"
+  fi
+}
+
+##
+# Create directories for whmcs_storage
+##
 ensure_tree_if_empty() {
   root="$1"; shift
   mkdir -p "$root"
@@ -37,6 +56,9 @@ ensure_tree_if_empty() {
   fi
 }
 
+##
+# Download WHMCS files via official API
+##
 fetch_whmcs_into() {
   dest="$1"
   tmp="$(mktemp -d)"; dir="$tmp/unzip"; mkdir -p "$dir"
@@ -76,45 +98,76 @@ fetch_whmcs_into() {
   log "WHMCS installed to $dest (owned by $WHMCS_WRITE_UID:$WHMCS_WRITE_GID)"
 }
 
+
+####
+## Functions below are executed manually by user post WHMCS installation
+## due to WHMCS having to generate configuration.php after initial installation
+####
+
+
+##
+# Move crons folder to whmcs_storage
+# Update cron config and main whmcs config to reflect the new crons location
+##
 move_crons_to_storage() {
   src="$WHMCS_WEB_ROOT/crons"
   dst="$WHMCS_STORAGE_DIR/crons"
+
   [ -d "$src" ] || { log "No crons/ in web root; skipping move."; return 0; }
+
   mkdir -p "$dst"
   if ! is_empty_dir "$dst"; then
     log "$dst already has content; leaving crons/ as-is."
     return 0
   fi
+
   log "Moving crons/ to $dst …"
   cp -a "$src"/. "$dst"/ && rm -rf "$src"
   chown -R "$WHMCS_WRITE_UID:$WHMCS_WRITE_GID" "$dst"
 
-  cron_cfg_new="$dst/config.php.new"; cron_cfg="$dst/config.php"
+  # Ensure crons/config.php exists (WHMCS may ship config.php.new)
+  cron_cfg_new="$dst/config.php.new"
+  cron_cfg="$dst/config.php"
   [ -f "$cron_cfg_new" ] && [ ! -f "$cron_cfg" ] && mv "$cron_cfg_new" "$cron_cfg"
 
+  # Set $whmcspath inside crons/config.php (append if missing, replace if present)
   if [ -f "$cron_cfg" ]; then
     root_path="${WHMCS_WEB_ROOT%/}/"
-    if grep -q '^[[:space:]]*//[[:space:]]*\$whmcspath' "$cron_cfg"; then
-      sed -i "s#^[[:space:]]*//[[:space:]]*\\\$whmcspath.*#\$whmcspath = '${root_path//\//\\/}';#" "$cron_cfg"
-    elif grep -q '^[[:space:]]*\\$whmcspath' "$cron_cfg"; then
-      sed -i "s#^[[:space:]]*\\\$whmcspath.*#\$whmcspath = '${root_path//\//\\/}';#" "$cron_cfg"
-    else
-      printf "\n\$whmcspath = '%s';\n" "$root_path" >> "$cron_cfg"
-    fi
+    sed_set_or_append_php_var "$cron_cfg" "whmcspath" "$root_path"
   else
     warn "$cron_cfg not found; add \$whmcspath later."
   fi
 
-  main_cfg="$WHMCS_WEB_ROOT/configuration.sample.php"
+  # Set $crons_dir in main configuration.php (append/replace)
+  main_cfg="$WHMCS_WEB_ROOT/configuration.php"
   crons_path="${dst%/}/"
   if [ -f "$main_cfg" ]; then
-    if grep -q '^[[:space:]]*\\$crons_dir' "$main_cfg"; then
-      sed -i "s#^[[:space:]]*\\\$crons_dir.*#\$crons_dir = '${crons_path//\//\\/}';#" "$main_cfg"
-    else
-      printf "\n\$crons_dir = '%s';\n" "$crons_path" >> "$main_cfg"
-    fi
+    sed_set_or_append_php_var "$main_cfg" "crons_dir" "$crons_path"
   else
-    warn "$main_cfg not found; after install add: \$crons_dir = '$crons_path'."
+    warn "$main_cfg not found; complete the initial WHMCS installation first."
   fi
+
   log "crons/ moved and configs updated (per WHMCS guidance)."
+}
+
+##
+# Set templates_c location to whmcs_storage
+# This function simply appends config value with new path to templates_c 
+##
+set_templates_compiledir_config() {
+  main_cfg="$WHMCS_WEB_ROOT/configuration.php"
+  [ -f "$main_cfg" ] || die "configuration.php not found; complete the initial WHMCS installation first."
+
+  storage_tc="${WHMCS_STORAGE_DIR%/}/templates_c"
+
+  # Ensure the target dir exists & is writable by PHP user
+  install -d -o "$WHMCS_WRITE_UID" -g "$WHMCS_WRITE_GID" -m 0755 "$storage_tc" || true
+
+  # Set/replace the config value
+  sed_set_or_append_php_var "$main_cfg" "templates_compiledir" "${storage_tc%/}/"
+
+  # Keep ownership sane (harmless if already correct)
+  chown "$WHMCS_WRITE_UID:$WHMCS_WRITE_GID" "$main_cfg" || true
+
+  log "Set \$templates_compiledir to ${storage_tc%/}/"
 }

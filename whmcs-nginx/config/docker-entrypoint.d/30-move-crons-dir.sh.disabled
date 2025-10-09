@@ -1,5 +1,0 @@
-#!/bin/sh
-set -eu; (set -o pipefail 2>/dev/null) && set -o pipefail
-. /usr/local/lib/whmcs-lib.sh
-
-move_crons_to_storage
