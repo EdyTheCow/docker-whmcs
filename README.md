@@ -61,7 +61,7 @@ docker run --rm --entrypoint htpasswd httpd:latest -Bbn YOUR_USER_HERE YOUR_PASS
 Paste the output into `whmcs/compose/.env` for variable `BASIC_AUTH_CREDENTIALS`.
 
 <b>Start docker compose</b><br />
-Inside of `_base/compose` run the command below. This will start Traefik reverse proxy.
+Inside of `_base/compose/` run the command below. This will start Traefik reverse proxy.
  ```
 docker-compose up -d
  ```
@@ -79,7 +79,7 @@ Navigate to `whmcs/compose/.env` and set these variables:
 If you're still unsure about your Traefik's subnet, set it as example value shown above for now. Then later on once WHMCS is running navigate to `System Logs > Admin Log` and you'll see IP Address. It should look something like `172.18.0.2` or similar. We're interested in the second number. So if the IP shown was `172.18.0.2` the subnet that should be set as: `172.18.0.0/16`. Restart and check the logs again, this time your real IP should be displayed.
 
 <b>Start docker compose</b><br />
-Inside of `whmcs/compose` run the command below. This will start WHMCS and rest of the services.
+Inside of `whmcs/compose/` run the command below. This will start WHMCS and rest of the services.
  ```
 docker compose up -d
  ```
@@ -93,22 +93,27 @@ Latest stable version of WHMCS should be automatically downloaded to `whmcs/data
 | Database Password | Found in `whmcs/compose/.env` |
 | Database Name     | whmcs                         |
 
-After installation delete the install folder in `whmcs/data/whmcs/install` and follow the instruction below for additional configuration and security hardening.
+> [!TIP]  
+> You can automate majority of configuration by using post-install script. You can run the script by using the command below, once you reach screen asking you to delete install directory. Steps marked with `[automated by script]` can be ignored if you choose to run the script.
+
+Navigate to `whmcs/compose/` and run command below. Proceed with steps without `[automated by script]` tag.
+```sh
+docker compose exec nginx sh -lc '/usr/local/bin/whmcs-post-install-config.sh'
+```
+If you choose not to run the script, complete all the steps below manually.
 
 # 🔒 Security Hardening
-Make sure to complete all of the steps below! After you have completed all of the steps, you should be ideally left with two warning and none "Needing Attention" complaints inside "System Health" tab. One warning complaining about it running Nginx instead of Apache (this is safe to ignore). The other complaining about usage of default template names. This is also safe to ignore, but linked documentation should be read if you plan on customizing templates to follow the best practices.
+Make sure to complete all of the steps below! Once completed, you should be ideally left with two warning and none "Needing Attention" complaints inside "System Health" tab. One warning complaining about it running Nginx instead of Apache (this is safe to ignore). The other complaining about usage of default template names. This is also safe to ignore, but linked documentation should be read if you plan on customizing templates to follow the best practices.
 
-### Changing Configuration Permissions
-Official source: [docs.whmcs.com](https://docs.whmcs.com/Further_Security_Steps#Secure_the_configuration.php_File) <br />
-Navigate to `whmcs/data/whmcs` and run 
-```
-sudo chmod 400 configuration.php
-```
-
-### Setting correct URL
+## Setting correct URL
 Official source: [docs.whmcs.com](https://docs.whmcs.com/Further_Security_Steps#Enable_SSL) <br />
 Sometimes the URL in admin panel might be using http instead of https which may cause a warning for invalid SSL certificate.
 In the WHMCS panel navigate to `System Setting > General Settings` and make sure `Domain` and `WHMCS System URL` are using https.
+
+## Setting update folder
+Official source: [help.whmcs.com](https://help.whmcs.com/m/updating/l/678178-configuring-the-temporary-path) <br />
+Setting update folder will allow you to automatically update WHMCS in the future. Similar to file storage the update folder will be located above the web root inside `whmcs_storage` directory.
+Navigate to `Automation Status (gear icon) > Update WHMCS > Configure Update Settings` and set the directory to `/var/www/whmcs_storage/whmcs_updater_tmp_dir`
 
 ## Moving Files Above Web Root
 Moving files above web root is a recommended practice by official WHMCS documentation. This is fairly easy to do using docker volumes. 
@@ -125,11 +130,11 @@ Navigate to `System Setting > Storage Settings` under `Configurations` add liste
 
 Navigate to `Settings` tab and replace the old paths with the newly added ones.
 
-### Templates Cache
+### Templates Cache `[automated by script]`
 Official source: [docs.whmcs.com](https://docs.whmcs.com/Further_Security_Steps#Templates_Cache) <br />
 Navigate to `whmcs/data/whmcs/configuration.php` and change path for `$templates_compiledir` to `/var/www/whmcs_storage/templates_c`
 
-### Crons Directory
+### Crons Directory `[automated by script]`
 Official source: [docs.whmcs.com](https://docs.whmcs.com/Further_Security_Steps#Move_the_Crons_Directory) <br />
 1. Navigate to `whmcs/data/whmcs` and move `crons` directory to `whmcs/data/whmcs_storage`. <br />
 2. Navigate to `whmcs/data/whmcs_storage/crons` and edit `config.php.new`, inside the config uncomment the `whmcspath` option and set the new path to `/var/www/html/`. <br />
@@ -138,15 +143,17 @@ Official source: [docs.whmcs.com](https://docs.whmcs.com/Further_Security_Steps#
 
 If done correctly, crons should be now located outside web root and system set to look for new crons location as recommended by WHMCS.
 
-### eMail Import Cron (optional)
+## Changing Configuration Permissions `[automated by script]`
+Official source: [docs.whmcs.com](https://docs.whmcs.com/Further_Security_Steps#Secure_the_configuration.php_File) <br />
+Navigate to `whmcs/data/whmcs/` and run 
+```
+sudo chmod 400 configuration.php
+```
+
+## eMail Import Cron (optional)
 Official source: [docs.whmcs.com](https://docs.whmcs.com/Email_Importing) <br />
 Navigate to `whmcs/compose` and edit `docker-compose.yml`, inside the file uncomment the two commands under the ofelia-labels.<br />
 Rebuild stack with `docker compose down && docker compose up -d`.
-
-## Setting update folder
-Official source: [help.whmcs.com](https://help.whmcs.com/m/updating/l/678178-configuring-the-temporary-path) <br />
-Setting update folder will allow you to automatically update WHMCS in the future. Similar to file storage the update folder will be located above the web root inside `whmcs_storage` directory.
-Navigate to `Automation Status (gear icon) > Update WHMCS > Configure Update Settings` and set the directory to `/var/www/whmcs_storage/whmcs_updater_tmp_dir`
 
 # 🐛 Known issues
 
