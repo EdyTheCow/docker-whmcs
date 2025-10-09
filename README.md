@@ -87,10 +87,11 @@ Latest stable version of WHMCS should be automatically downloaded to `whmcs/data
 
 | Field             | Default value                 |
 | ----------------- | ----------------------------- |
-| Database host     | mysql                         |
-| Database name     | whmcs                         |
-| Database user     | whmcs                         |
-| Database password | Found in `whmcs/compose/.env` |
+| License Key       |                               |
+| Database Host     | mysql                         |
+| Database Username | whmcs                         |
+| Database Password | Found in `whmcs/compose/.env` |
+| Database Name     | whmcs                         |
 
 After installation delete the install folder in `whmcs/data/whmcs/install` and follow the instruction below for additional configuration and security hardening.
 
