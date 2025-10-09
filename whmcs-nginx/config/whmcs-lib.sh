@@ -154,7 +154,7 @@ move_crons_to_storage() {
 # Set templates_c location to whmcs_storage
 # This function simply appends config value with new path to templates_c 
 ##
-set_templates_compiledir_config() {
+set_templates_location() {
   main_cfg="$WHMCS_WEB_ROOT/configuration.php"
   [ -f "$main_cfg" ] || die "configuration.php not found; complete the initial WHMCS installation first."
 

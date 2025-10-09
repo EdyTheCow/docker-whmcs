@@ -6,6 +6,6 @@ set -eu; (set -o pipefail 2>/dev/null) && set -o pipefail
 move_crons_to_storage
 
 # 2) Relocate templates_c to whmcs_storage by updating configuration.php ($templates_compiledir) to new path
-set_templates_compiledir
+set_templates_location
 
 log "Post-install configuration done."
