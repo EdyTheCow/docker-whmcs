@@ -12,12 +12,6 @@
 [providers.docker]
   exposedbydefault = false
 
-[certificatesResolvers.cloudflare.acme]
-  email = "admin@your_domain.com"
-  [certificatesResolvers.cloudflare.acme.dnsChallenge]
-    provider = "cloudflare"
-    delayBeforeCheck = 0
-
 [certificatesResolvers.letsencrypt.acme]
   email = "admin@your_domain.com"
   storage = "acme.json"

@@ -30,8 +30,8 @@ services:
       - "traefik.http.services.whmcs-https.loadbalancer.server.port=80"
       # Basic auth for /admin page
       - "traefik.http.routers.whmcs-admin.rule=Host(`${DOMAIN}`) && PathPrefix(`/admin`)"
-      - "traefik.http.middlewares.basic-auth.basicauth.usersfile=/.htpasswd"
-      - "traefik.http.routers.whmcs-admin.middlewares=basic-auth"
+      - "traefik.http.middlewares.whmcs-admin-auth.basicauth.users=${BASIC_AUTH_CREDENTIALS}"
+      - "traefik.http.routers.whmcs-admin.middlewares=whmcs-admin-auth"
       - "traefik.http.routers.whmcs-admin.tls=true"
 
   php-fpm:

@@ -14,9 +14,6 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ${DATA_DIR}/traefik/traefik.toml:/etc/traefik/traefik.toml
       - ${DATA_DIR}/traefik/acme.json:/acme.json
-      - ${DATA_DIR}/traefik/.htpasswd:/.htpasswd
-    labels:
-      - "traefik.http.middlewares.basic-auth.basicauth.usersfile=/.htpasswd"
 
 networks:
   docker-whmcs-network:
