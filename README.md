@@ -94,7 +94,7 @@ Latest stable version of WHMCS should be automatically downloaded to `whmcs/data
 | Database Name     | whmcs                         |
 
 > [!TIP]  
-> You can automate majority of configuration by using post-install script. You can run the script by using the command below, once you reach screen asking you to delete install directory. Steps marked with `[automated by script]` can be ignored if you choose to run the script.
+> You can automate majority of configuration by using post-install script. You can run the script by using the command below, once you reach screen asking you to delete install directory. Steps marked with `[automated by script]` can be ignored if you choose to run the script. You can inspect the script itself at `docker-images` branch.
 
 Navigate to `whmcs/compose/` and run command below. Proceed with steps without `[automated by script]` tag.
 ```sh
