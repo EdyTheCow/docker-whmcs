@@ -7,7 +7,16 @@
 The point of this project is a production ready solution for running WHMCS in docker under Traefik reverse proxy. There's already a couple other projects attempting something similar. However, they are either meant for development only, are outdated and/or not optimized to be ran under Traefik. This project complies with all of the official WHMCS security and packages recommendations that are found at ["Further Security Steps"](https://docs.whmcs.com/Further_Security_Steps) and ["System Environment Guide"](https://docs.whmcs.com/System_Environment_Guide).
 
 > [!NOTE]  
-> This exact installation is currently being used in live production. It is being actively maintained and tested. PRs, suggestions and issue reports are more than welcome. Consider leaving a star if you found this helpful! ❤️
+> This exact installation is currently being used in live production. It is being actively maintained and tested. PRs, suggestions and issue reports are more than welcome. Consider leaving a star if you found this project helpful! ❤️
+
+# ✨ Features
+- **Pre-built docker images**: whmcs-nginx and whmcs-php-fpm, ready to be deployed
+- **As minimal as possible**, includes only configuration and dependencies needed to run WHMCS
+- **Based on official images**: nginx and php-fpm, no weird and obscure base image
+- **Follows best practices** according to official WHMCS docs (references are provided below)
+- **Uses WHMCS public API** to download WHMCS files into docker volume automatically
+- **Modular scripts to automate** parts of installation and configuration (more info in docker-images branch)
+- **Dokploy support**, easily deploy WHMCS using provided docker compose in `whmcs-dokploy`
 
 # 👓 Quick Overview
 The `_base` directory currently only includes Traefik. If you're already using Traefik, you can use it as a guide and plug & play the `whmcs` part into your existing setup. Directory `whmcs-dokploy` can be ignored. If you're interested in using Dokploy, read the instructions found inside of `whmcs-dokploy`.
@@ -40,15 +49,16 @@ sudo chmod 600 acme.json
 docker network create docker-whmcs-network
 ```
 
-<b>Generate .htpasswd user and password</b><br />
-Navigate to `_base/data/traefik/.htpasswd` and place your htpasswd user/password there.
+<b>Generate basic auth user and password</b><br />
+This will set a basic auth for WHMCS admin page. Setting this up is highly recommended. In practice this means, as an admin you'll have to login with basic auth and then login with WHMCS admin credentials. This is extremely effective against bots and endless spam of attempted and failed logins. Basic auth is usually cached by web browser, normally you'll only need to login once. This will not affect normal users, only admins.
 
-To generate `.htpasswd` credentials you can use this one-liner command. It uses the official Apache docker image from official source on Docker Hub.
-```
-docker run --rm --entrypoint htpasswd httpd:latest -Bbn <username> <password> > .htpasswd
-```
+Don't use the same credentials as WHMCS admin account in case you'll have to share it with another admin. You can set up multiple basic auth credentials, but this is only used as a simple tactic against bots, so set it as something simple. You'll still need WHMCS admin credentials to actually login into WHMCS. If you don't want this, simply remove traefik labels under comment "Basic auth for /admin page" in `docker-compose.yml`.
 
-Once done, whenever you navigate to your whmcs admin area, you'll have to login with credentials you just generated and then login with your WHMCS admin user. This basic auth is very effective against bots and endless spam in emails of attempted and failed logins. This only applies for admin page of WHMCS, regular users won't be affected.
+To generate basic auth credentials you can use this one-liner command. It uses the official Apache docker image from official source on Docker Hub.
+```
+docker run --rm --entrypoint htpasswd httpd:latest -Bbn YOUR_USER_HERE YOUR_PASSWORD_HERE | sed -e s/\\$/\\$\\$/g
+```
+Paste the output into `whmcs/compose/.env` for variable `BASIC_AUTH_CREDENTIALS`.
 
 <b>Start docker compose</b><br />
 Inside of `_base/compose` run the command below. This will start Traefik reverse proxy.
@@ -73,9 +83,16 @@ Inside of `whmcs/compose` run the command below. This will start WHMCS and rest 
  ```
 docker compose up -d
  ```
-Latest stable version of WHMCS should be automatically downloaded to `whmcs/data/whmcs` using WHMCS public API. Now you can navigate to `your-domain.com/install` and follow the installation insturctions. Use `mysql` for MySQL host. User, database name and password are found in `whmcs/compose/.env` where you configured them earlier.
+Latest stable version of WHMCS should be automatically downloaded to `whmcs/data/whmcs` using WHMCS public API. Now you can navigate to `your-domain.com/install` and follow the installation insturctions. 
 
-After installation delete the install folder in `whmcs/data/whmcs/install` and follow the instruction below for additional configuration for security hardening.
+| Field             | Default value                 |
+| ----------------- | ----------------------------- |
+| Database host     | mysql                         |
+| Database name     | whmcs                         |
+| Database user     | whmcs                         |
+| Database password | Found in `whmcs/compose/.env` |
+
+After installation delete the install folder in `whmcs/data/whmcs/install` and follow the instruction below for additional configuration and security hardening.
 
 # 🔒 Security Hardening
 Make sure to complete all of the steps below! After you have completed all of the steps, you should be ideally left with two warning and none "Needing Attention" complaints inside "System Health" tab. One warning complaining about it running Nginx instead of Apache (this is safe to ignore). The other complaining about usage of default template names. This is also safe to ignore, but linked documentation should be read if you plan on customizing templates to follow the best practices.
