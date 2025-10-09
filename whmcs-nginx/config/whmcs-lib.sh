@@ -65,7 +65,7 @@ fetch_whmcs_into() {
 
   # Resolve download URL + checksum
   if [ -z "$WHMCS_URL" ]; then
-    log "Querying WHMCS Distributions API (type=${WHMCS_CHANNEL})…"
+    log "Querying WHMCS Distributions API (type=${WHMCS_CHANNEL})..."
     json="$(curl -fsSL "https://api1.whmcs.com/download/latest?type=${WHMCS_CHANNEL}")" || die "API request failed"
     url="$(echo "$json" | jq -r '.url')" || die "parse url failed"
     sha="$(echo "$json" | jq -r '.sha256Checksum' || true)"
@@ -170,4 +170,39 @@ set_templates_location() {
   chown "$WHMCS_WRITE_UID:$WHMCS_WRITE_GID" "$main_cfg" || true
 
   log "Set \$templates_compiledir to ${storage_tc%/}/"
+}
+
+##
+# Delete the install directory (required post-installaion)
+##
+delete_install_dir() {
+  inst="$WHMCS_WEB_ROOT/install"
+  if [ -d "$inst" ]; then
+    log "Removing $inst (per WHMCS install completion step)..."
+    rm -rf -- "$inst"
+    log "Removed $inst."
+  else
+    log "No install/ directory found at $inst; nothing to do."
+  fi
+}
+
+##
+# Set configuration.php permissions to 400 (owner-read only)
+# Make sure the file owner matches the PHP user, otherwise 400 will block PHP
+##
+set_configuration_mode_400() {
+  cfg="$WHMCS_WEB_ROOT/configuration.php"
+  if [ ! -f "$cfg" ]; then
+    die "configuration.php not found at $cfg. Complete the installation first."
+  fi
+
+  # Heads-up if ownership looks wrong for 400
+  owner_uid="$(stat -c '%u' "$cfg" 2>/dev/null || echo '')"
+  if [ -n "$owner_uid" ] && [ -n "${WHMCS_WRITE_UID:-}" ] && [ "$owner_uid" != "$WHMCS_WRITE_UID" ]; then
+    warn "configuration.php owner UID ($owner_uid) != WHMCS_WRITE_UID ($WHMCS_WRITE_UID). \
+With mode 400, PHP must run as the file owner. Consider chowning to $WHMCS_WRITE_UID:$WHMCS_WRITE_GID."
+  fi
+
+  chmod 400 -- "$cfg"
+  log "Set permissions on configuration.php to 400. If WHMCS fails to load, try 440 or 444 (per docs)."
 }

@@ -8,4 +8,10 @@ move_crons_to_storage
 # 2) Relocate templates_c to whmcs_storage by updating configuration.php ($templates_compiledir) to new path
 set_templates_location
 
-log "Post-install configuration done."
+# 3) Delete the install directory (required post-installaion)
+delete_install_dir
+
+# 4) Set configuration.php permissions to 400 (owner-read only)
+set_configuration_mode_400
+
+log "Post-install configuration done!"
