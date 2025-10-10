@@ -3,8 +3,7 @@ services:
   nginx:
     image: ghcr.io/edythecow/whmcs-nginx:latest
     volumes:
-      - whmcs-web-root:/var/www/html
-      - whmcs-storage:/var/www/whmcs_storage
+      - whmcs-www:/var/www
     environment:
       - NGINX_DOMAIN=${DOMAIN}
       - TRAEFIK_SUBNET=${TRAEFIK_SUBNET}
@@ -26,8 +25,7 @@ services:
   php-fpm:
     image: ghcr.io/edythecow/whmcs-php-fpm:latest
     volumes:
-      - whmcs-web-root:/var/www/html
-      - whmcs-storage:/var/www/whmcs_storage
+      - whmcs-www:/var/www
     environment:
       - PHP_IDE_CONFIG=xwhmcs
     labels:
@@ -58,6 +56,5 @@ services:
       - whmcs-database:/var/lib/mysql
 
 volumes:
-  whmcs-web-root:
-  whmcs-storage:
+  whmcs-www:
   whmcs-database:
