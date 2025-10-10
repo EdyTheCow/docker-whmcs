@@ -37,7 +37,7 @@ If you are confused about any of non Dokploy related steps, check out the main R
 | Database Password | Found in `Environment` tab    |
 | Database Name     | whmcs                         |
 
-8. Once you reach screen asking you to delete `install` directory. Navigate to `Terminal` in Dokploy, select `/bin/sh` and run this command:
+8. Once you reach screen asking you to delete `install` directory. Navigate to `Terminal` in Dokploy (make sure nginx is selected), select `/bin/sh` and run this command:
 
 ```sh
 sh -lc '/usr/local/bin/whmcs-post-install-config.sh'
