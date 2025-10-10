@@ -16,7 +16,7 @@ If you are confused about any of non Dokploy related steps, check out the main R
 
 1. Navigate to `Create service > Compose` fill out name, select server, etc.
 2. Navigate to tab `Raw` and copy / paste the contents of `whmcs-dokploy/docker-compose.yml`, click `Save`
-3. Navigate to `Environment` tab and copy / paste the contents of `whmcs-dokploy/.env`. Fill out all of the variables. You can leave `TRAEFIK_SUBNET` empty for now. Click `Save`
+3. Navigate to `Environment` tab and copy / paste the contents of `whmcs-dokploy/.env`. Fill out all of the variables. You can change `TRAEFIK_SUBNET` later on. Click `Save`
 4. Navigate to `Domains` tab, click `Add Domain` (your domain has to be pointing at the IP of server you selected earlier when creating service). Select these values:
 
 | Field             | Value                         |
@@ -46,6 +46,9 @@ sh -lc '/usr/local/bin/whmcs-post-install-config.sh'
 10. Complete the rest of post-installation steps below
 
 ## Post-installation steps
+
+### Setting correct TRAEFIK_SUBNET
+Navigate to `System Logs > Admin Log` and you'll see your IP Address. It should look something like `172.18.0.2` or similar. We're interested in the second number. So if the IP shown was `172.18.0.2` the subnet that should be set as: `172.18.0.0/16`. Restart and check the logs again, this time your real IP should be displayed.
 
 ### Setting update folder
 Official source: [help.whmcs.com](https://help.whmcs.com/m/updating/l/678178-configuring-the-temporary-path) <br />
