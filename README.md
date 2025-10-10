@@ -159,7 +159,7 @@ Rebuild stack with `docker compose down && docker compose up -d`.
 
 # 📝 Planned
 - Create and test an alternative installation with Apache web server
-- Create a ready to deploy Dokploy docker compose example
+- (Done) Create a ready to deploy Dokploy docker compose example
 
 # 📜 Credits
 - Logo created by Wob - [Dribbble.com/wob](https://dribbble.com/wob)
