@@ -11,8 +11,22 @@ on:
 
 jobs:
   build:
+    strategy:
+      fail-fast: false
+      matrix:
+        php: [ "7.2", "7.3", "7.4", "8.1", "8.2", "8.3" ]
+        include:
+          # Mark the "latest" for 8.3
+          - php: "8.3"
+            latest: true
+
     uses: ./.github/workflows/build-image-common.yml
     with:
       context: whmcs-php-fpm
-      image_tag: ghcr.io/edythecow/whmcs-php-fpm:latest
-      cache_scope: whmcs-php-fpm
+      # Always tag with php-<version> and tag latest for 8.3
+      image_tag: |
+        ghcr.io/edythecow/whmcs-php-fpm:php-${{ matrix.php }}
+        ${{ matrix.latest && 'ghcr.io/edythecow/whmcs-php-fpm:latest' || '' }}
+      cache_scope: whmcs-php-fpm-${{ matrix.php }}
+      build_args: |
+        PHP_VERSION=${{ matrix.php }}

@@ -12,6 +12,9 @@ on:
       cache_scope:
         required: true
         type: string
+      build_args:
+        required: false
+        type: string
 
 jobs:
   build-and-push:
@@ -40,5 +43,6 @@ jobs:
           context: ${{ inputs.context }}
           push: true
           tags: ${{ inputs.image_tag }}
+          build-args: ${{ inputs.build_args }}
           cache-from: type=gha,scope=${{ inputs.cache_scope }}
           cache-to:   type=gha,mode=max,scope=${{ inputs.cache_scope }}
