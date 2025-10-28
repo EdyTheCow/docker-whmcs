@@ -4,6 +4,17 @@ These docker images are built and published using Github Actions workflows. You 
 ## whmcs-php-fpm
 This image is built on top of official php-fpm image found on Docker Hub. It takes care of all the dependencies required to run WHMCS, the included dependencies are based on official WHMCS documentation and recommendations. Few configs are included with sensible default values.
 
+In case you need older PHP version for a theme, addon, etc. we build all PHP versions currently supported by WHMCS.
+
+| PHP Versions | Image tag        |
+| ------------ | ---------------- |
+| 8.3          | php-8.3 / latest |
+| 8.2          | php-8.2          |
+| 8.1          | php-8.1          |
+| 7.4          | php-7.4          |
+| 7.3          | php-7.3          |
+| 7.2          | php-7.2          |
+
 ## whmcs-nginx
 This image is built on top of official nginx image found on Docker Hub. It includes a default.conf template with variables, allowing for configuration without having to edit the file itself. Scripts are also included which download WHMCS files using API and create directories outside web root according to WHMCS recommendations. Downloading of WHMCS and folder creation will only execute if directory is empty (ignores .gitignore), otherwise it will skip.
 
